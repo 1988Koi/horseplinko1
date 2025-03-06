@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horse Plinko</title>
+    <style>
+        body {
+            text-align: center;
+            background: #222;
+            color: white;
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            margin: auto;
+            background: #444;
+        }
+        .bin.win {
+            background-color: green;
+        }
+        .bin.lose {
+            background-color: red;
+        }
+        #videoOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #videoOverlay video {
+            max-width: 90%;
+            max-height: 90%;
+        }
+    </style>
+</head>
+<body>
+    <img src="images/tumblr_90910ccd5482631e3c6725323a6efac2_96a8afaa_400.webp">
+    <canvas id="plinkoCanvas"></canvas>
+    <div id="videoOverlay">
+        <video id="resultVideo" controls></video>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script>
+        const { Engine, Render, Runner, World, Bodies, Body, Events, Vector } = Matter;
+
+        const engine = Engine.create();
+        const world = engine.world;
+        const canvas = document.getElementById("plinkoCanvas");
+        const width = 400, height = 600;
+        canvas.width = width;
+        canvas.height = height;
+
+        const render = Render.create({
+            canvas,
+            engine,
+            options: {
+                width, height, wireframes: false, background: "#444"
+            }
+        });
+
+        Render.run(render);
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
+        World.add(world, Bodies.rectangle(width / 2, height, width, 20, { isStatic: true }));
+
+        const rows = 7, cols = 10, pegRadius = 5;
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                let x = (col + 0.5 * (row % 2)) * (width / cols);
+                let y = (row + 1) * (height / (rows + 2));
+                World.add(world, Bodies.circle(x, y, pegRadius, { isStatic: true, render: { fillStyle: "white" } }));
+            }
+        }
+
+        const binWidth = width / cols;
+        const bins = [];
+        const winZones = [1, 3, 6, 8];
+        for (let i = 0; i <= cols; i++) {
+            let x = i * binWidth;
+            let y = height - 30;
+            let bin = Bodies.rectangle(x, y, 5, 100, { isStatic: true, render: { fillStyle: "white" } });
+            World.add(world, bin);
+            bins.push(bin);
+
+            if (winZones.includes(i)) {
+                bin.isWin = true;
+                bin.render.fillStyle = "green";
+            } else {
+                bin.isWin = false;
+                bin.render.fillStyle = "red";
+            }
+        }
+
+        const horseImg = new Image();
+        horseImg.src = "https://static.wikia.nocookie.net/yahiapedia/images/3/39/Horse.jpg/revision/latest?cb=20240521030702";
+
+        const videoOverlay = document.getElementById("videoOverlay");
+        const resultVideo = document.getElementById("resultVideo");
+        let gameFrozen = false;
+
+        document.addEventListener("click", () => {
+            if (gameFrozen) return;
+
+            const randomXOffset = (Math.random() - 0.5) * 50;
+            const randomXVelocity = (Math.random() - 0.5) * 5;
+
+            let horse = Bodies.rectangle(width / 2 + randomXOffset, 50, 20, 20, {
+                restitution: 0.5,
+                friction: 0.05,
+                frictionAir: 0.02,
+                density: 0.01,
+                render: { sprite: { texture: horseImg.src, xScale: 0.05, yScale: 0.05 } }
+            });
+
+            Body.setVelocity(horse, Vector.create(randomXVelocity, 0));
+
+            World.add(world, horse);
+
+            Events.on(engine, "beforeUpdate", () => {
+                const angleLimit = 0.2;
+                if (horse.angularVelocity > angleLimit) {
+                    Body.setAngularVelocity(horse, angleLimit);
+                }
+                if (horse.angularVelocity < -angleLimit) {
+                    Body.setAngularVelocity(horse, -angleLimit);
+                }
+            });
+
+            Events.on(engine, "collisionStart", (event) => {
+                const pairs = event.pairs;
+                for (let i = 0; i < pairs.length; i++) {
+                    const pair = pairs[i];
+                    if (pair.bodyA === horse || pair.bodyB === horse) {
+                        for (let j = 0; j < bins.length; j++) {
+                            if (pair.bodyA === bins[j] || pair.bodyB === bins[j]) {
+                                if (bins[j].isWin) {
+                                    resultVideo.src = "videos/dougclap.mp4";
+                                } else {
+                                    resultVideo.src = "videos/dougsad.mp4";
+                                }
+                                resultVideo.load();
+                                videoOverlay.style.display = "flex";
+                                resultVideo.play();
+                                resultVideo.onended = function(){
+                                    videoOverlay.style.display = "none";
+                                    World.remove(world, horse);
+                                    gameFrozen = false;
+                                }
+                                gameFrozen = true;
+                                Runner.stop(runner);
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        resultVideo.addEventListener('ended', function(){
+            Runner.run(runner,engine);
+        })
+    </script>
+</body>
+</html>
