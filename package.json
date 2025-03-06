@@ -1,0 +1,19 @@
+{
+  "name": "horseplinko",
+  "version": "1.0.0",
+  "description": "why did i do this",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1988Koi/horseplinko1.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/1988Koi/horseplinko1/issues"
+  },
+  "homepage": "https://github.com/1988Koi/horseplinko1#readme"
+}
