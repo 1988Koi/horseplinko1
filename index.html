@@ -42,7 +42,7 @@
     </style>
 </head>
 <body>
-    <img src="images/tumblr_90910ccd5482631e3c6725323a6efac2_96a8afaa_400.webp">
+    <img src="Public/images/horseplinko.gif">
     <canvas id="plinkoCanvas"></canvas>
     <div id="videoOverlay">
         <video id="resultVideo" controls></video>
@@ -143,9 +143,9 @@
                         for (let j = 0; j < bins.length; j++) {
                             if (pair.bodyA === bins[j] || pair.bodyB === bins[j]) {
                                 if (bins[j].isWin) {
-                                    resultVideo.src = "public/videos/dougclap.mp4";
+                                    resultVideo.src = "Public/videos/dougclap.mp4";
                                 } else {
-                                    resultVideo.src = "public/videos/dougsad.mp4";
+                                    resultVideo.src = "Public/videos/dougsad.mp4";
                                 }
                                 resultVideo.load();
                                 videoOverlay.style.display = "flex";
