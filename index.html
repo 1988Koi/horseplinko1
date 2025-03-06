@@ -42,7 +42,7 @@
     </style>
 </head>
 <body>
-    <img src="Public/images/horseplinko.gif">
+    <img src="wwwroot/images/horseplinko.gif">
     <canvas id="plinkoCanvas"></canvas>
     <div id="videoOverlay">
         <video id="resultVideo" controls></video>
@@ -101,7 +101,7 @@
         }
 
         const horseImg = new Image();
-        horseImg.src = "Public/images/Horse.jpg";
+        horseImg.src = "wwwroot/images/Horse.jpg";
 
         const videoOverlay = document.getElementById("videoOverlay");
         const resultVideo = document.getElementById("resultVideo");
@@ -143,9 +143,9 @@
                         for (let j = 0; j < bins.length; j++) {
                             if (pair.bodyA === bins[j] || pair.bodyB === bins[j]) {
                                 if (bins[j].isWin) {
-                                    resultVideo.src = "Public/videos/dougclap.mp4";
+                                    resultVideo.src = "wwwroot/videos/dougclap.mp4";
                                 } else {
-                                    resultVideo.src = "Public/videos/dougsad.mp4";
+                                    resultVideo.src = "wwwroot/videos/dougclap.mp4";
                                 }
                                 resultVideo.load();
                                 videoOverlay.style.display = "flex";
