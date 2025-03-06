@@ -101,7 +101,7 @@
         }
 
         const horseImg = new Image();
-        horseImg.src = "https://static.wikia.nocookie.net/yahiapedia/images/3/39/Horse.jpg/revision/latest?cb=20240521030702";
+        horseImg.src = "Public/images/Horse.jpg";
 
         const videoOverlay = document.getElementById("videoOverlay");
         const resultVideo = document.getElementById("resultVideo");
@@ -143,9 +143,9 @@
                         for (let j = 0; j < bins.length; j++) {
                             if (pair.bodyA === bins[j] || pair.bodyB === bins[j]) {
                                 if (bins[j].isWin) {
-                                    resultVideo.src = "videos/dougclap.mp4";
+                                    resultVideo.src = "public/videos/dougclap.mp4";
                                 } else {
-                                    resultVideo.src = "videos/dougsad.mp4";
+                                    resultVideo.src = "public/videos/dougsad.mp4";
                                 }
                                 resultVideo.load();
                                 videoOverlay.style.display = "flex";
