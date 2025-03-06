@@ -135,34 +135,64 @@
                 }
             });
 
-            Events.on(engine, "collisionStart", (event) => {
-                const pairs = event.pairs;
-                for (let i = 0; i < pairs.length; i++) {
-                    const pair = pairs[i];
-                    if (pair.bodyA === horse || pair.bodyB === horse) {
-                        for (let j = 0; j < bins.length; j++) {
-                            if (pair.bodyA === bins[j] || pair.bodyB === bins[j]) {
-                                if (bins[j].isWin) {
-                                    Image.src = "/Public/images/dougclap.mp4";
-                                } else {
-                                    Image.src = "/Public/images/dougclap.mp4";
-                                }
-                                resultVideo.load();
-                                videoOverlay.style.display = "flex";
-                                resultVideo.play();
-                                resultVideo.onended = function(){
-                                    videoOverlay.style.display = "none";
-                                    World.remove(world, horse);
-                                    gameFrozen = false;
-                                }
-                                gameFrozen = true;
-                                Runner.stop(runner);
-                                break;
-                            }
-                        }
+const winSound = new Audio("Public/audio/win.mp3");
+const loseSound = new Audio("Public/audio/lose.mp3");
+
+winSound.volume = 1;
+loseSound.volume = 1;
+
+Events.on(engine, "collisionStart", (event) => {
+    const pairs = event.pairs;
+    for (let i = 0; i < pairs.length; i++) {
+        const pair = pairs[i];
+        if (pair.bodyA === horse || pair.bodyB === horse) {
+            for (let j = 0; j < bins.length; j++) {
+                if (pair.bodyA === bins[j] || pair.bodyB === bins[j]) {
+                    const isWin = bins[j].isWin;
+                    if (isWin) {
+                        // Play win sound
+                        winSound.play();
+
+                        // Create the full-screen image for win
+                        const winImage = document.createElement("img");
+                        winImage.src = "Public/images/Cantaloupe.png"; // Set the path to your win image
+                        winImage.style.position = "absolute";
+                        winImage.style.top = "0";
+                        winImage.style.left = "0";
+                        winImage.style.width = "100%";
+                        winImage.style.height = "100%";
+                        winImage.style.zIndex = "9999";
+                        winImage.style.objectFit = "cover";
+
+                        document.body.appendChild(winImage);
+                    } else {
+                        // Play lose sound
+                        loseSound.play();
+
+                        // Handle losing scenario, same logic as win but with a different image if necessary
+                        const loseImage = document.createElement("img");
+                        loseImage.src = "Public/images/Fish.png"; // Set the path to your losing image
+                        loseImage.style.position = "absolute";
+                        loseImage.style.top = "0";
+                        loseImage.style.left = "0";
+                        loseImage.style.width = "100%";
+                        loseImage.style.zIndex = "9999"; // Ensure it is on top of other elements
+                        loseImage.style.objectFit = "cover"; // Ensure it covers the screen, even if stretched
+
+                        document.body.appendChild(loseImage);
                     }
+
+                    gameFrozen = true;
+                    Runner.stop(runner);
+                    break;
                 }
-            });
+            }
+        }
+    }
+});
+
+
+
         });
         resultVideo.addEventListener('ended', function(){
             Runner.run(runner,engine);
